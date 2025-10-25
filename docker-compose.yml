@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: carwash-db
+    env_file:
+      - ./env/.env.database
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend:
+    image: lanovich/carwash-backend:latest
+    container_name: carwash-backend
+    env_file:
+      - ./env/.env.backend
+    depends_on:
+      - db
+    ports:
+      - "4203:4203"
+    restart: unless-stopped
+
+  frontend:
+    image: lanovich/carwash-frontend:latest
+    container_name: carwash-frontend
+    env_file:
+      - ./env/.env.frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:8080"
+    restart: unless-stopped
+
+volumes:
+  db-data:
